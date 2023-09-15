@@ -1,0 +1,197 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Member {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  username      String?
+  password      String?
+  firstname     String?
+  lastname      String?
+  bankAccount   String?
+  bank          String?
+  phone         String?
+  line          String?
+  email         String?
+  emailVerified Boolean?  @default(false)
+  createdAt     DateTime? @default(now())
+  updatedAt     DateTime? @updatedAt
+  deleted_at    DateTime? @map("deleted_at")
+  userAG        UserAG[]
+}
+
+model UserAG {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  username           String?
+  originAG           String?
+  position           String?
+  percent            Float?    @default(0)
+  commission         Boolean?  @default(false)
+  overdue            Boolean?  @default(false)
+  adjustPercentage   Boolean?  @default(false)
+  pay                Boolean?  @default(false)
+  customerCommission Boolean?  @default(false)
+  actuallypaid       Boolean?  @default(false)
+  recommender        String?
+  createdAt          DateTime? @default(now())
+  updatedAt          DateTime? @updatedAt
+  deleted_at         DateTime? @map("deleted_at")
+  memberId           String?   @db.ObjectId
+  member             Member?   @relation(fields: [memberId], references: [id])
+}
+
+model QueueBot {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  title      String?
+  username   String?
+  position   String?
+  startDate  String?
+  endDate    String?
+  status     String?   @default("WAIT")
+  file_name  String?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+  deleted_at DateTime? @map("deleted_at")
+  pastAG     PastAG[]
+}
+
+model PastAG {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  Account          String?
+  Contact          String?
+  Cur              String?
+  Amount           Float?
+  ValidAmount      Float?
+  MemberCount      Float?
+  StakeCount       Float?
+  GrossCom         Float?
+  MemberWL         Float?
+  MemberCom        Float?
+  MemberWLCom      Float?
+  SuperProfitValid Float?
+  SuperProfitWL    Float?
+  SuperProfitCom   Float?
+  SuperProfitWLCom Float?
+  CompanyValid     Float?
+  CompanyWL        Float?
+  CompanyCom       Float?
+  CompanyWLCom     Float?
+  position         String?
+  pastAGID         String?
+  agentId          String?
+  masterId         String?
+  customerId       String?
+  createdAt        DateTime? @default(now())
+  updatedAt        DateTime? @updatedAt
+  deleted_at       DateTime? @map("deleted_at")
+  queueBotId       String?   @db.ObjectId
+  queueBot         QueueBot? @relation(fields: [queueBotId], references: [id])
+}
+
+model PastBETFLIX {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  online     Int?
+  comC       Int?
+  loseC      Int?
+  loseM      Int?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+  deleted_at DateTime? @map("deleted_at")
+}
+
+model Admin {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  username    String?
+  password    String?
+  firstname   String?
+  lastname    String?
+  bankAccount String?
+  bank        String?
+  phone       String?
+  line        String?
+  nickName    String?
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  deleted_at  DateTime? @map("deleted_at")
+}
+
+model AgentIncomeSystem {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  comSum          Int?
+  interestUFA     Int?
+  interestBETFLIX Int?
+  interesSum      Int?
+  percentage      Int?
+  totalLoss       Int?
+  income          Int?
+  createdAt       DateTime? @default(now())
+  updatedAt       DateTime? @updatedAt
+  deleted_at      DateTime? @map("deleted_at")
+}
+
+model InvestmentUser {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  username   String?
+  password   String?
+  createdAt  DateTime? @default(now())
+  updatedAt  DateTime? @updatedAt
+  deleted_at DateTime? @map("deleted_at")
+}
+
+model MastertIncomeSystem {
+  id                      String    @id @default(auto()) @map("_id") @db.ObjectId
+  comSum                  Int?
+  interestUFA             Int?
+  interestBETFLIX         Int?
+  comA                    Int?
+  fullPayAgent            Int?
+  actualPayAgent          Int?
+  totalLoss               Int?
+  percentage              Int?
+  income                  Int?
+  recommendedValueUFRUU   Int?
+  recommendedValueUFRUV   Int?
+  recommendedValueUFRUV02 Int?
+  createdAt               DateTime? @default(now())
+  updatedAt               DateTime? @updatedAt
+  deleted_at              DateTime? @map("deleted_at")
+}
+
+model MinusIncome {
+  id              String    @id @default(auto()) @map("_id") @db.ObjectId
+  negativeBalance Int?
+  transferOverdue Int?
+  pomotion        Int?
+  investment      Int?
+  createdAt       DateTime? @default(now())
+  updatedAt       DateTime? @updatedAt
+  deleted_at      DateTime? @map("deleted_at")
+}
+
+model RightsManagement {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  page        String?
+  rightToWork String?
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt
+  deleted_at  DateTime? @map("deleted_at")
+}
+
+model TransferSummary {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  recommendedValue Int?
+  agentTotal       Int?
+  masterTotal      Int?
+  investment       Int?
+  createdAt        DateTime? @default(now())
+  updatedAt        DateTime? @updatedAt
+  deleted_at       DateTime? @map("deleted_at")
+}

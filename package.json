@@ -1,0 +1,30 @@
+{
+  "name": "psd-meback-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:producer": "cd producer && nodemon index.js",
+    "start:consumer": "cd consumer && nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "5.3.0",
+    "amqplib": "^0.10.3",
+    "axios": "^1.5.0",
+    "exceljs": "^4.3.0",
+    "express": "^4.18.2",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4",
+    "n": "^9.1.0",
+    "nodemon": "^3.0.1",
+    "puppeteer": "^21.2.1",
+    "redis": "^4.6.8"
+  },
+  "devDependencies": {
+    "prisma": "5.3.0"
+  }
+}
