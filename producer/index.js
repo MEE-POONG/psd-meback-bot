@@ -2,13 +2,15 @@ const express = require("express");
 const moment = require("moment/moment");
 const path = require('path');
 const fs = require('fs');
+var cors = require('cors')
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
-const directoryPath = path.join(__dirname, '../consumer/excel');
+const directoryPath = path.join(__dirname, '../excel');
 
 const app = express();
-const PORT = process.env.PORT || 4001;
+app.use(cors())
+const PORT = process.env.PORT || 6661;
 
 app.use(express.json());
 
@@ -63,8 +65,8 @@ app.get("/list", async (req, res) => {
 app.get("/file/:id", async (req, res) => {
 
     try {
-        readFileCustomized('../consumer/excel/' + req.params.id);
-        const file = path.join(__dirname, '../consumer/excel/' + req.params.id);
+        const file = path.join(__dirname, '../excel/' + req.params.id);
+        console.log(file);
         res.download(file); // Set disposition and send it.
     } catch (error) {
         console.error(error.message);
@@ -87,11 +89,11 @@ app.get("/send-msg", async (req, res) => {
 
 })
 
-app.get("/agent", async (req, res) => {
+app.post("/agent", async (req, res) => {
     try {
         const queue = 'agent'
         const data = {
-            title: "AGENT",
+            title: req.body.title || "AGENT",
             username: req.body.username || 'ADMIN',
             position: req.body.position || 'ADMIN',
             startDate: req.body.startDate ? moment(req.body.startDate).format('MM/DD/YYYY') : '',
@@ -108,15 +110,15 @@ app.get("/agent", async (req, res) => {
         console.log("A message is sent to queue", queue_bot)
         res.send("Start Agent " + moment().format('MMMM Do YYYY, h:mm:ss a'));
     } catch (error) {
-        res.statusCode(400).send("Error Master " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
+        res.status(400).send("Error Master " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
     }
 })
 
-app.get("/master", async (req, res) => {
+app.post("/master", async (req, res) => {
     try {
         const queue = 'master'
         const data = {
-            title: "MASTER",
+            title: req.body.title || "MASTER",
             username: req.body.username || '',
             position: req.body.position || '',
             startDate: req.body.startDate ? moment(req.body.startDate).format('MM/DD/YYYY') : '',
@@ -133,15 +135,15 @@ app.get("/master", async (req, res) => {
         console.log("A message is sent to queue", queue_bot)
         res.send("Start Master " + moment().format('MMMM Do YYYY, h:mm:ss a'));
     } catch (error) {
-        res.statusCode(400).send("Error Master " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
+        res.status(400).send("Error Master " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
     }
 })
 
-app.get("/customer", async (req, res) => {
+app.post("/customer", async (req, res) => {
     try {
         const queue = 'customer'
         const data = {
-            title: "CUSTOMER",
+            title: req.body.title || "CUSTOMER",
             username: req.body.username || '',
             position: req.body.position || '',
             startDate: req.body.startDate ? moment(req.body.startDate).format('MM/DD/YYYY') : '',
@@ -158,23 +160,9 @@ app.get("/customer", async (req, res) => {
         console.log("A message is sent to queue", queue_bot)
         res.send("Start Customer " + moment().format('MMMM Do YYYY, h:mm:ss a'));
     } catch (error) {
-        res.statusCode(400).send("Error Customer " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
+        res.status(400).send("Error Customer " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
     }
 })
 
 
 app.listen(PORT, () => console.log("Server running at port " + PORT));
-
-
-
-function readFileCustomized(filePath) {
-    try {
-        return fs.readFileSync(filePath, 'utf8');
-    } catch (error) {
-        if (error.code === 'ENOENT') {
-            throw new Error('Custom error message: File not found');
-        } else {
-            throw error; // Re-throw other errors
-        }
-    }
-}

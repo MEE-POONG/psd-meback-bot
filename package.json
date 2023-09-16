@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start:producer": "cd producer && nodemon index.js",
-    "start:consumer": "cd consumer && nodemon index.js"
+    "start:producer": "cd producer && node index.js",
+    "start:consumer": "cd consumer && node index.js"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +15,7 @@
     "@prisma/client": "5.3.0",
     "amqplib": "^0.10.3",
     "axios": "^1.5.0",
+    "cors": "^2.8.5",
     "exceljs": "^4.3.0",
     "express": "^4.18.2",
     "lodash": "^4.17.21",

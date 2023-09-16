@@ -58,7 +58,9 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
 
     const browser = await puppeteer.launch({ headless: "new", defaultViewport: { width: 1920, height: 5000 }, args });
     const page = await browser.newPage();
-    let list = []
+    let list_customer = []
+    let list_agent = []
+    let list_master = []
 
     try {
         let element, resultTable, resultAgen;
@@ -104,6 +106,7 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
                 }
             }
             resultTable.shift()
+            list_master = [...list_master, ...resultTable];
 
             //หาเอเย่น
             for (var x = 0; x < resultTable.length; x++) {
@@ -135,6 +138,7 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
                         }
                     }
                     resultAgen.shift()
+                    list_agent = [...list_agent, ...resultAgen];
 
                     for (var z = 0; z < resultAgen.length; z++) {
                         await page.goto(
@@ -167,17 +171,79 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
                         resultCustomer.shift()
                         Array.from(resultCustomer, column => column.push(resultAgen[z][0]));
                         Array.from(resultCustomer, column => column.push(resultTable[x][0]));
-                        list = [...list, ...resultCustomer];
+                        list_customer = [...list_customer, ...resultCustomer];
                     }
                 }
             }
         }
         console.log('export excel: success');
         browser.close();
-        console.log("list : ", list);
         var re = new RegExp('/', 'g');
+
+
         let tutorials = [];
-        list.forEach((obj) => {
+        let tutorials_agent = [];
+        let tutorials_master = [];
+
+        list_master.forEach((obj) => {
+            tutorials_master.push({
+                Account: obj[0],
+                Contact: obj[1],
+                Cur: obj[2],
+                Amount: parseFloat(obj[3].replace(/,/g, '')),
+                ValidAmount: parseFloat(obj[4].replace(/,/g, '')),
+                MemberCount: parseFloat(obj[5].replace(/,/g, '')),
+                StakeCount: parseFloat(obj[6].replace(/,/g, '')),
+                GrossCom: parseFloat(obj[7].replace(/,/g, '')),
+                MemberWL: parseFloat(obj[8].replace(/,/g, '')),
+                MemberCom: parseFloat(obj[9].replace(/,/g, '')),
+                MemberWLCom: parseFloat(obj[10].replace(/,/g, '')),
+                SuperProfitValid: parseFloat(obj[11].replace(/,/g, '')),
+                SuperProfitWL: parseFloat(obj[12].replace(/,/g, '')),
+                SuperProfitCom: parseFloat(obj[13].replace(/,/g, '')),
+                SuperProfitWLCom: parseFloat(obj[14].replace(/,/g, '')),
+                CompanyValid: parseFloat(obj[15].replace(/,/g, '')),
+                CompanyWL: parseFloat(obj[16].replace(/,/g, '')),
+                CompanyCom: parseFloat(obj[17].replace(/,/g, '')),
+                CompanyWLCom: parseFloat(obj[18].replace(/,/g, '')),
+                customerId: obj[0],
+                agentId: obj[19],
+                masterId: obj[20],
+                position: "MASTER",
+                queueBotId
+            });
+        });
+
+        list_agent.forEach((obj) => {
+            tutorials_agent.push({
+                Account: obj[0],
+                Contact: obj[1],
+                Cur: obj[2],
+                Amount: parseFloat(obj[3].replace(/,/g, '')),
+                ValidAmount: parseFloat(obj[4].replace(/,/g, '')),
+                MemberCount: parseFloat(obj[5].replace(/,/g, '')),
+                StakeCount: parseFloat(obj[6].replace(/,/g, '')),
+                GrossCom: parseFloat(obj[7].replace(/,/g, '')),
+                MemberWL: parseFloat(obj[8].replace(/,/g, '')),
+                MemberCom: parseFloat(obj[9].replace(/,/g, '')),
+                MemberWLCom: parseFloat(obj[10].replace(/,/g, '')),
+                SuperProfitValid: parseFloat(obj[11].replace(/,/g, '')),
+                SuperProfitWL: parseFloat(obj[12].replace(/,/g, '')),
+                SuperProfitCom: parseFloat(obj[13].replace(/,/g, '')),
+                SuperProfitWLCom: parseFloat(obj[14].replace(/,/g, '')),
+                CompanyValid: parseFloat(obj[15].replace(/,/g, '')),
+                CompanyWL: parseFloat(obj[16].replace(/,/g, '')),
+                CompanyCom: parseFloat(obj[17].replace(/,/g, '')),
+                CompanyWLCom: parseFloat(obj[18].replace(/,/g, '')),
+                customerId: obj[0],
+                agentId: obj[19],
+                masterId: obj[20],
+                position: "AGENT",
+                queueBotId
+            });
+        });
+
+        list_customer.forEach((obj) => {
             tutorials.push({
                 Account: obj[0],
                 Contact: obj[1],
@@ -205,7 +271,58 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
                 queueBotId
             });
         });
+
         let workbook = new excel.Workbook();
+
+        let worksheet_master = workbook.addWorksheet(`MASTER`);
+        worksheet_master.columns = [
+            { header: "Account", key: "Account", width: 15 },
+            { header: "Contact", key: "Contact", width: 15 },
+            { header: "Cur", key: "Cur", width: 5 },
+            { header: "Amount", key: "Amount", width: 15 },
+            { header: "Valid Amount", key: "ValidAmount", width: 15 },
+            { header: "Member Count", key: "MemberCount", width: 15 },
+            { header: "Stake Count", key: "StakeCount", width: 15 },
+            { header: "Gross Comm", key: "GrossCom", width: 15 },
+            { header: "Members W/L", key: "MemberWL", width: 15 },
+            { header: "Members Com", key: "MemberCom", width: 15 },
+            { header: "Members W/L + Com", key: "MemberWLCom", width: 25 },
+            { header: "Master/Agent Profit Valid Amount", key: "SuperProfitValid", width: 30 },
+            { header: "Master/Agent Profit W/L", key: "SuperProfitWL", width: 30 },
+            { header: "Master/Agent Profit Com", key: "SuperProfitCom", width: 30 },
+            { header: "Master/Agent Profit W/L + Com", key: "SuperProfitWLCom", width: 30 },
+            { header: "Company Profit Valid Amount", key: "CompanyValid", width: 30 },
+            { header: "Company Profit W/L", key: "CompanyWL", width: 30 },
+            { header: "Company Profit Com", key: "CompanyCom", width: 30 },
+            { header: "Company Profit W/L + Com", key: "CompanyWLCom", width: 30 },
+        ];
+        worksheet_master.addRows(tutorials_master);
+
+
+        let worksheet_agent = workbook.addWorksheet(`AGENT`);
+        worksheet_agent.columns = [
+            { header: "Account", key: "Account", width: 15 },
+            { header: "Contact", key: "Contact", width: 15 },
+            { header: "Cur", key: "Cur", width: 5 },
+            { header: "Amount", key: "Amount", width: 15 },
+            { header: "Valid Amount", key: "ValidAmount", width: 15 },
+            { header: "Member Count", key: "MemberCount", width: 15 },
+            { header: "Stake Count", key: "StakeCount", width: 15 },
+            { header: "Gross Comm", key: "GrossCom", width: 15 },
+            { header: "Members W/L", key: "MemberWL", width: 15 },
+            { header: "Members Com", key: "MemberCom", width: 15 },
+            { header: "Members W/L + Com", key: "MemberWLCom", width: 25 },
+            { header: "Master/Agent Profit Valid Amount", key: "SuperProfitValid", width: 30 },
+            { header: "Master/Agent Profit W/L", key: "SuperProfitWL", width: 30 },
+            { header: "Master/Agent Profit Com", key: "SuperProfitCom", width: 30 },
+            { header: "Master/Agent Profit W/L + Com", key: "SuperProfitWLCom", width: 30 },
+            { header: "Company Profit Valid Amount", key: "CompanyValid", width: 30 },
+            { header: "Company Profit W/L", key: "CompanyWL", width: 30 },
+            { header: "Company Profit Com", key: "CompanyCom", width: 30 },
+            { header: "Company Profit W/L + Com", key: "CompanyWLCom", width: 30 },
+        ];
+        worksheet_agent.addRows(tutorials_agent);
+
         let worksheet = workbook.addWorksheet(`CUSTOMER`);
         worksheet.columns = [
             { header: "Account", key: "Account", width: 15 },
@@ -228,16 +345,15 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
             { header: "Company Profit Com", key: "CompanyCom", width: 30 },
             { header: "Company Profit W/L + Com", key: "CompanyWLCom", width: 30 },
         ];
-        // Add Array Rows
         worksheet.addRows(tutorials);
         workbook.xlsx.writeFile(`./excel/${file_name}`).then(() => {
             console.log("file saved! " + file_name);
         });
-        return tutorials;
+        return [...tutorials_master, ...tutorials_agent, ...tutorials];
     } catch (error) {
         console.log(error);
         await prisma.QueueBot.update({
-            where: { id },
+            where: { id: queueBotId },
             data: { status: 'FAILED', updatedAt: moment().format() },
         })
         return [];

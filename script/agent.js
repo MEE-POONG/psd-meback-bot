@@ -201,7 +201,7 @@ const AGENT = (async (file_name, queueBotId, from, to) => {
     } catch (error) {
         console.log(error);
         await prisma.QueueBot.update({
-            where: { id },
+            where: { id: queueBotId },
             data: { status: 'FAILED', updatedAt: moment().format() },
         })
         return [];

@@ -55,7 +55,7 @@ const MASTER = (async (file_name, queueBotId, from, to) => {
 
     const FROM = from ? from : moment().startOf('month').format('MM/DD/YYYY')
     const TO = to ? to : moment().endOf('month').format('MM/DD/YYYY')
-    
+
     const browser = await puppeteer.launch({ headless: "new", defaultViewport: { width: 1920, height: 5000 }, args });
     const page = await browser.newPage();
     let list = []
@@ -169,7 +169,7 @@ const MASTER = (async (file_name, queueBotId, from, to) => {
     } catch (error) {
         console.log(error);
         await prisma.QueueBot.update({
-            where: { id },
+            where: { id: queueBotId },
             data: { status: 'FAILED', updatedAt: moment().format() },
         })
         return [];
