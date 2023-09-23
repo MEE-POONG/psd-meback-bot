@@ -10,7 +10,7 @@ const prisma = new PrismaClient()
 
 
 const user_Check = [
-    { username: 'ufrcbvip', pass: 'Pp123456++', useCheck: 'ufrcb' }
+    { username: 'ufruuvip', pass: 'Pp123456++', useCheck: 'ufruu' }
 ]
 const agtest = "http://ocean.isme99.com"
 
