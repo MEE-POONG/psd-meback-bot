@@ -2,56 +2,23 @@
 const _ = require('lodash')
 const puppeteer = require('puppeteer')
 const excel = require('exceljs')
+const fs = require('fs')
 const moment = require('moment/moment')
 require('moment/locale/th')
 
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
+const { args } = require('../config/args')
+const { user_Check } = require('../config/user_check')
+const { agtest } = require('../config/ag_link')
+const { createWorker } = require('tesseract.js');
 
-
-const user_Check = [
-    { username: 'ufruuvip', pass: 'Pp123456++', useCheck: 'ufruu' }
-]
-const agtest = "http://ocean.isme99.com"
-
-const args = [
-    '--autoplay-policy=user-gesture-required',
-    '--disable-background-networking',
-    '--disable-background-timer-throttling',
-    '--disable-backgrounding-occluded-windows',
-    '--disable-breakpad',
-    '--disable-client-side-phishing-detection',
-    '--disable-component-update',
-    '--disable-default-apps',
-    '--disable-dev-shm-usage',
-    '--disable-domain-reliability',
-    '--disable-extensions',
-    '--disable-features=AudioServiceOutOfProcess',
-    '--disable-hang-monitor',
-    '--disable-ipc-flooding-protection',
-    '--disable-notifications',
-    '--disable-offer-store-unmasked-wallet-cards',
-    '--disable-popup-blocking',
-    '--disable-print-preview',
-    '--disable-prompt-on-repost',
-    '--disable-renderer-backgrounding',
-    '--disable-setuid-sandbox',
-    '--disable-speech-api',
-    '--disable-sync',
-    '--hide-scrollbars',
-    '--ignore-gpu-blacklist',
-    '--metrics-recording-only',
-    '--mute-audio',
-    '--no-default-browser-check',
-    '--no-first-run',
-    '--no-pings',
-    '--no-sandbox',
-    '--no-zygote',
-    '--password-store=basic',
-    '--use-gl=swiftshader',
-    '--use-mock-keychain',
-];
 const CUSTOMER = (async (file_name, queueBotId, from, to) => {
+
+    const worker = await createWorker('eng');
+    await worker.setParameters({
+        tessedit_char_whitelist: '0123456789',
+    });
 
     const FROM = from ? from : moment().startOf('month').format('MM/DD/YYYY')
     const TO = to ? to : moment().endOf('month').format('MM/DD/YYYY')
@@ -65,20 +32,46 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
     try {
         let element, resultTable, resultAgen;
         for (const [idx, data] of user_Check.entries()) {
+
+
             await page.goto(agtest + `/Public/Default11.aspx`, { waitUntil: 'load' })
             element = await page.$x(`//*[@id="txtUserName"]`)
             await element[0].type(data.username);
             element = await page.$x(`//*[@id="txtPassword"]`)
             await element[0].type(data.pass);
 
+            const birthday = new Date();
+            const date1 = birthday.getTime();
+            const pathPhoto = __dirname + '/img/captcha' + date1 + '.png'
+            await page.waitForSelector('#divImgCode > img') // Method to ensure that the element is loaded
+            const captcha = await page.$('#divImgCode > img') // captcha is the element you want to capture
+            await captcha.screenshot({
+                path: pathPhoto
+            })
+            await sleep(2000)
 
-            await page.waitForXPath(`//*[@id="btnSignIn"]`, { visible: true })
-            element = await page.$x(`//*[@id="btnSignIn"]`)
-            await Promise.all([
-                element[0].click(),
-                page.waitForNavigation({ waitUntil: 'load' })
-            ])
+            const { data: { text } } = await worker.recognize(pathPhoto);
+            console.log(text, 'length', text.length);
+            await worker.terminate();
 
+            if (text.length !== 5) {
+                await browser.close()
+                return CUSTOMER(file_name, queueBotId, from, to)
+            }
+
+            element = await page.$x(`//*[@id="txtCode"]`)
+            console.log('text', text);
+            await element[0].type(text)
+            fs.unlink(pathPhoto, (err => { return; }));
+            await sleep(1000)
+
+
+            const title = await page.title();
+            if (title === ':: Management ::') {
+                console.log('login ไม่สำเร็จ');
+                await browser.close()
+                return CUSTOMER(file_name, queueBotId, from, to)
+            }
             console.log('login สำเร็จ');
 
             await page.goto(
@@ -174,6 +167,7 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
                         list_customer = [...list_customer, ...resultCustomer];
                     }
                 }
+                await sleep(5000)
             }
         }
         console.log('export excel: success');
@@ -360,5 +354,9 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
     }
 })
 
+function sleep(ms) {
 
+    return new Promise((resolve) => setInterval(resolve, ms));
+
+}
 exports.CUSTOMER = CUSTOMER;

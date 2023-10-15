@@ -1,0 +1,1 @@
+exports.agtest = "http://ag.777beer.com"
