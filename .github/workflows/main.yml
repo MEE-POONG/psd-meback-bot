@@ -25,13 +25,13 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       #     - name: Build the Docker image
-      #       run: docker build -t chunwarayut/${{ steps.string.outputs.lowercase }}:latest .
+      #       run: docker build -t chunwarayut/psd-meback-bot:latest .
 
       - name: Push to Docker Hub RN
         uses: docker/build-push-action@v4
         with:
           push: true
-          tags: chunwarayut/${{ steps.string.outputs.lowercase }}:latest
+          tags: chunwarayut/psd-meback-bot:latest
 
       - name: SSH Command
         uses: D3rHase/ssh-command-action@v0.2.2
@@ -39,4 +39,4 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           user: ${{ secrets.SERVER_USER }}
           private_key: ${{ secrets.SSH_KEY }}
-          command: docker pull chunwarayut/${{ steps.string.outputs.lowercase }}:latest && docker stop ${{ steps.string.outputs.lowercase }} && docker rm ${{ steps.string.outputs.lowercase }} && docker run --name ${{ steps.string.outputs.lowercase }} --restart=always -d -p 6040:3000 chunwarayut/${{ steps.string.outputs.lowercase }}
+          command: docker pull chunwarayut/psd-meback-bot:latest && docker stop psd-meback-bot && docker rm psd-meback-bot && docker run --name psd-meback-bot --restart=always -d chunwarayut/psd-meback-bot
