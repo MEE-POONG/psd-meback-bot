@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start:producer": "cd producer && node index.js",
     "start:consumer": "npx prisma generate && cd consumer && node index.js",
-    "build-push": "docker build --platform linux/amd64 -t chunwarayut/psd-rabbit-bot:latest . && docker push chunwarayut/psd-rabbit-bot:latest"
+    "build-push": "docker build --platform linux/amd64 -t chunwarayut/psd-meback-bot:latest . && docker push chunwarayut/psd-meback-bot:latest"
   },
   "keywords": [],
   "author": "",
