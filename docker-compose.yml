@@ -1,0 +1,13 @@
+version: '3'
+services:
+  app:
+    build: .
+    volumes:
+      - .:/usr/src/app/
+      - dependencies:/usr/src/app/node_modules
+    working_dir: /usr/src/app
+    environment:
+      DATABASE_URL: "mongodb://sos:sos123@128.199.79.240:27017,167.71.218.166:27017,167.71.220.110:27017/psdDB?authSource=admin&replicaSet=me_mongodb"
+    ports:
+      - 4002:4002
+    command: yarn start:consumer

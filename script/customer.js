@@ -32,19 +32,31 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
     try {
         let element, resultTable, resultAgen;
         for (const [idx, data] of user_Check.entries()) {
-
-
+            console.log(await page.title());
             await page.goto(agtest + `/Public/Default11.aspx`, { waitUntil: 'load' })
+            console.log(await page.title());
             element = await page.$x(`//*[@id="txtUserName"]`)
             await element[0].type(data.username);
             element = await page.$x(`//*[@id="txtPassword"]`)
             await element[0].type(data.pass);
+            console.log(await page.title());
+
+            await page.screenshot({
+                path: 'screenshot.png',
+            })
+            console.log('screenshot');
 
             const birthday = new Date();
             const date1 = birthday.getTime();
             const pathPhoto = __dirname + '/img/captcha' + date1 + '.png'
-            await page.waitForSelector('#divImgCode > img') // Method to ensure that the element is loaded
+            try {
+                await page.waitForSelector('#divImgCode > img') // Method to ensure that the element is loaded
+            } catch (error) {
+                await browser.close()
+                return CUSTOMER(file_name, queueBotId, from, to)
+            }
             const captcha = await page.$('#divImgCode > img') // captcha is the element you want to capture
+
             await captcha.screenshot({
                 path: pathPhoto
             })
@@ -167,7 +179,7 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
                         list_customer = [...list_customer, ...resultCustomer];
                     }
                 }
-                await sleep(5000)
+                // await sleep(5000)
             }
         }
         console.log('export excel: success');
@@ -346,6 +358,11 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
         return [...tutorials_master, ...tutorials_agent, ...tutorials];
     } catch (error) {
         console.log(error);
+
+        await page.screenshot({
+            path: 'error_screenshot.png',
+        })
+
         await prisma.QueueBot.update({
             where: { id: queueBotId },
             data: { status: 'FAILED', updatedAt: moment().format() },
