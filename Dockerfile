@@ -10,6 +10,17 @@ RUN apt-get update && apt-get install gnupg wget -y && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /usr/src/app
+
+
+
+ENV DATABASE_URL="mongodb://sos:sos123@128.199.79.240:27017/psdDB?authSource=admin&replicaSet=me_mongodb"
+
+RUN echo "DATABASE_URL=$DATABASE_URL"
+RUN echo "DATABASE_URL=$DATABASE_URL" >> .env
+
+
+
+
 COPY package.json ./
 RUN yarn install
 COPY . .
