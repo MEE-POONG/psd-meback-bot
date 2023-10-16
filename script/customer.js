@@ -32,6 +32,8 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
     try {
         let element, resultTable, resultAgen;
         for (const [idx, data] of user_Check.entries()) {
+
+            await sleep(2000)
             console.log(await page.title());
             await page.goto(agtest + `/Public/Default11.aspx`, { waitUntil: 'load' })
             console.log(await page.title());
@@ -40,6 +42,8 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
             element = await page.$x(`//*[@id="txtPassword"]`)
             await element[0].type(data.pass);
             console.log(await page.title());
+
+            await sleep(2000)
 
             await page.screenshot({
                 path: 'screenshot.png',
