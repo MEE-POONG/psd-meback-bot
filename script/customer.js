@@ -33,7 +33,6 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
         let element, resultTable, resultAgen;
         for (const [idx, data] of user_Check.entries()) {
 
-            await sleep(2000)
             console.log(await page.title());
             await page.goto(agtest + `/Public/Default11.aspx`, { waitUntil: 'load' })
             console.log(await page.title());
@@ -43,12 +42,15 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
             await element[0].type(data.pass);
             console.log(await page.title());
 
-            await sleep(2000)
-
             await page.screenshot({
                 path: 'screenshot.png',
             })
             console.log('screenshot');
+
+            if (await page.title() === 'UFABET บาคาร่าออนไลน์ - เว็บบาคาร่าที่คนเล่นเยอะที่สุด ในประเทศไทย') {
+                await browser.close()
+                return CUSTOMER(file_name, queueBotId, from, to)
+            }
 
             const birthday = new Date();
             const date1 = birthday.getTime();
