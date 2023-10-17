@@ -6,6 +6,8 @@ const fs = require('fs')
 const moment = require('moment/moment')
 require('moment/locale/th')
 
+const cmd = require('node-cmd');
+
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 const { args } = require('../config/args')
@@ -360,7 +362,11 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
         worksheet.addRows(tutorials);
         workbook.xlsx.writeFile(`./excel/${file_name}`).then(() => {
             console.log("file saved! " + file_name);
+            cmd.runSync(`scp ./excel/${file_name} root@167.71.220.88:/root/projects/psd-meback-bot/excel/${file_name}`);
         });
+
+
+
         return [...tutorials_master, ...tutorials_agent, ...tutorials];
     } catch (error) {
         console.log(error);
