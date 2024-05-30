@@ -21,7 +21,7 @@ var channel, connection;
 async function connectQueue() {
     try {
 
-        connection = await amqp.connect("amqp://167.71.220.88:5672");
+        connection = await amqp.connect("amqp://admin:admin@43.249.35.14:5672");
         channel = await connection.createChannel()
 
         // connect to 'test-queue', create one if doesnot exist already

@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^5.4.2",
+    "@prisma/client": "5.14.0",
     "amqplib": "^0.10.3",
     "axios": "^1.5.1",
     "basic-ftp": "^5.0.3",
@@ -25,6 +25,7 @@
     "moment": "^2.29.4",
     "n": "^9.2.0",
     "node-cmd": "^5.0.0",
+    "node-tesseract-ocr": "^2.2.1",
     "nodemon": "^3.0.1",
     "puppeteer": "^21.3.8",
     "redis": "^4.6.10",
@@ -34,6 +35,6 @@
     "yarn-upgrade-all": "^0.7.2"
   },
   "devDependencies": {
-    "prisma": "^5.4.2"
+    "prisma": "5.14.0"
   }
 }

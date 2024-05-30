@@ -362,7 +362,7 @@ const CUSTOMER = (async (file_name, queueBotId, from, to) => {
         worksheet.addRows(tutorials);
         workbook.xlsx.writeFile(`./excel/${file_name}`).then(() => {
             console.log("file saved! " + file_name);
-            cmd.runSync(`scp ./excel/${file_name} root@167.71.220.88:/root/projects/psd-meback-bot/excel/${file_name}`);
+            cmd.runSync(`cp excel/${file_name} consumer/excel/`);
         });
 
 

@@ -18,10 +18,10 @@ var channel, connection;
 
 connectQueue()
 async function connectQueue() {
-    connection = await amqp.connect("amqp://167.71.220.88:5672");
+    connection = await amqp.connect("amqp://admin:admin@43.249.35.14:5672");
     channel = await connection.createChannel()
 
-    connection = await amqp.connect("amqp://167.71.220.88:5672");
+    connection = await amqp.connect("amqp://admin:admin@43.249.35.14:5672");
     channel = await connection.createChannel()
 
     await channel.assertQueue("agent", { durable: true })
@@ -36,7 +36,7 @@ async function connectQueue() {
         const content = JSON.parse(Buffer.from(data.content))
         const { id, startDate, endDate } = content
         console.log(id)
-        await prisma.QueueBot.update({
+        await prisma.queueBot.update({
             where: { id },
             data: { status: 'WAITTING', updatedAt: moment().format() },
         })
@@ -46,15 +46,18 @@ async function connectQueue() {
         const tutorials = await AGENT(file_name, id, startDate, endDate)
 
         try {
-            await prisma.PastAG.createMany({ data: tutorials })
-            await prisma.QueueBot.update({
+            if (tutorials.length == 0) {
+                throw new Error("No data")
+            }
+            await prisma.pastAG.createMany({ data: tutorials })
+            await prisma.queueBot.update({
                 where: { id },
                 data: { status: 'SUCCESS', updatedAt: moment().format(), file_name },
             })
         } catch (error) {
             console.log(error)
 
-            await prisma.QueueBot.update({
+            await prisma.queueBot.update({
                 where: { id },
                 data: { status: 'FAILED', updatedAt: moment().format() },
             })
@@ -70,7 +73,7 @@ async function connectQueue() {
         const content = JSON.parse(Buffer.from(data.content))
         const { id, startDate, endDate } = content
         console.log(id)
-        await prisma.QueueBot.update({
+        await prisma.queueBot.update({
             where: { id },
             data: { status: 'WAITTING', updatedAt: moment().format() },
         })
@@ -80,14 +83,14 @@ async function connectQueue() {
         const tutorials = await MASTER(file_name, id, startDate, endDate)
 
         try {
-            await prisma.PastAG.createMany({ data: tutorials })
-            await prisma.QueueBot.update({
+            await prisma.pastAG.createMany({ data: tutorials })
+            await prisma.queueBot.update({
                 where: { id },
                 data: { status: 'SUCCESS', updatedAt: moment().format(), file_name },
             })
         } catch (error) {
             console.log(error)
-            await prisma.QueueBot.update({
+            await prisma.queueBot.update({
                 where: { id },
                 data: { status: 'FAILED', updatedAt: moment().format() },
             })
@@ -101,7 +104,7 @@ async function connectQueue() {
         const content = JSON.parse(Buffer.from(data.content))
         const { id, startDate, endDate } = content
         console.log(id)
-        await prisma.QueueBot.update({
+        await prisma.queueBot.update({
             where: { id },
             data: { status: 'WAITTING', updatedAt: moment().format() },
         })
@@ -111,15 +114,15 @@ async function connectQueue() {
         const tutorials = await CUSTOMER(file_name, id, startDate, endDate)
 
         try {
-            await prisma.PastAG.createMany({ data: tutorials })
-            await prisma.QueueBot.update({
+            await prisma.pastAG.createMany({ data: tutorials })
+            await prisma.queueBot.update({
                 where: { id },
                 data: { status: 'SUCCESS', updatedAt: moment().format(), file_name },
             })
             channel.ack(data, true)
         } catch (error) {
             console.log(error)
-            await prisma.QueueBot.update({
+            await prisma.queueBot.update({
                 where: { id },
                 data: { status: 'FAILED', updatedAt: moment().format() },
             })

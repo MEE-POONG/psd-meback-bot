@@ -7,7 +7,7 @@ services:
       - dependencies:/usr/src/app/node_modules
     working_dir: /usr/src/app
     environment:
-      DATABASE_URL: "mongodb://sos:sos123@128.199.79.240:27017,167.71.218.166:27017,167.71.220.110:27017/psdDB?authSource=admin&replicaSet=me_mongodb"
+      DATABASE_URL: "mongodb+srv://chunwarayut:05r31M9wnI4dE87L@db-mongodb-sgp-bb56ac46.mongo.ondigitalocean.com/psdbotdb?authSource=admin"
     ports:
       - 4002:4002
     command: yarn start:consumer

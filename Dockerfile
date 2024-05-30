@@ -13,7 +13,7 @@ WORKDIR /usr/src/app
 
 
 
-ENV DATABASE_URL="mongodb://sos:sos123@128.199.79.240:27017/psdDB?authSource=admin&replicaSet=me_mongodb"
+ENV DATABASE_URL="mongodb+srv://chunwarayut:05r31M9wnI4dE87L@db-mongodb-sgp-bb56ac46.mongo.ondigitalocean.com/psdbotdb"
 
 RUN echo "DATABASE_URL=$DATABASE_URL"
 RUN echo "DATABASE_URL=$DATABASE_URL" >> .env

@@ -12,7 +12,7 @@ const prisma = new PrismaClient()
 const user_Check = [
     { username: 'ufruuvip', pass: 'Pp123456++', useCheck: 'ufruu' }
 ]
-const agtest = "http://ocean.isme99.com"
+const agtest = "http://ag.777beer.com"
 
 const args = [
     '--autoplay-policy=user-gesture-required',
