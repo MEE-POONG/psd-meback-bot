@@ -28,6 +28,7 @@ async function connectQueue() {
         await channel.assertQueue("test-queue")
         await channel.assertQueue("agent")
         await channel.assertQueue("master")
+        await channel.assertQueue("all-agent")
 
     } catch (error) {
         console.log(error)
@@ -163,6 +164,31 @@ app.post("/customer", async (req, res) => {
         res.status(400).send("Error Customer " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
     }
 })
+app.post("/all-agent", async (req, res) => {
+    try {
+        const queue = 'all-agent'
+        const data = {
+            title: req.body.title || "ALL-AGENT",
+            username: req.body.username || '',
+            position: req.body.position || '',
+            startDate: req.body.startDate ? moment(req.body.startDate).format('MM/DD/YYYY') : '',
+            endDate: req.body.endDate ? moment(req.body.endDate).format('MM/DD/YYYY') : '',
+            createdAt: moment().format(),
+            updatedAt: moment().format(),
+            status: 'WAIT',
+        }
+
+        const queue_bot = await prisma.queueBot.create({
+            data: data,
+        })
+        sendData(queue_bot, queue);
+        console.log("A message is sent to queue", queue_bot)
+        res.send("Start Customer " + moment().format('MMMM Do YYYY, h:mm:ss a'));
+    } catch (error) {
+        res.status(400).send("Error Customer " + moment().format('MMMM Do YYYY, h:mm:ss a') + '\n' + error);
+    }
+})
+
 
 
 app.listen(PORT, () => console.log("Server running at port " + PORT));

@@ -8,12 +8,12 @@ const fs = require("fs");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-const { args } = require("../config/args");
-const { user_Check } = require("../config/user_check");
-const { agtest } = require("../config/ag_link");
+const { args } = require("../../config/args");
+const { user_Check } = require("../../config/user_check");
+const { agtest } = require("../../config/ag_link");
 const { createWorker } = require("tesseract.js");
 
-const AGENT = async (file_name, queueBotId, from, to) => {
+const ALL_AGENT = async ( queueBotId, from, to) => {
   const ag_link = agtest[Math.floor(Math.random() * agtest.length)];
   console.log(ag_link);
   const worker = await createWorker("eng");
@@ -55,11 +55,11 @@ const AGENT = async (file_name, queueBotId, from, to) => {
 
       if (
         (await page.title()) ===
-        "UFABET บาคาร่าออนไลน์ - เว็บบาคาร่าที่คนเล่นเยอะที่สุด ในประเทศไทย" ||
+          "UFABET บาคาร่าออนไลน์ - เว็บบาคาร่าที่คนเล่นเยอะที่สุด ในประเทศไทย" ||
         (await page.title()) === "Just a moment..."
       ) {
         await browser.close();
-        return AGENT(file_name, queueBotId, from, to);
+        return ALL_AGENT( queueBotId, from, to);
       }
 
       const birthday = new Date();
@@ -69,7 +69,7 @@ const AGENT = async (file_name, queueBotId, from, to) => {
         await page.waitForSelector("#divImgCode > img"); // Method to ensure that the element is loaded
       } catch (error) {
         await browser.close();
-        return AGENT(file_name, queueBotId, from, to);
+        return ALL_AGENT( queueBotId, from, to);
       }
       const captcha = await page.$("#divImgCode > img"); // captcha is the element you want to capture
 
@@ -86,7 +86,7 @@ const AGENT = async (file_name, queueBotId, from, to) => {
 
       if (text.length !== 5) {
         await browser.close();
-        return AGENT(file_name, queueBotId, from, to);
+        return ALL_AGENT( queueBotId, from, to);
       }
 
       element = await page.$x(`//*[@id="txtCode"]`);
@@ -102,7 +102,7 @@ const AGENT = async (file_name, queueBotId, from, to) => {
       if (title === ":: Management ::") {
         console.log("login ไม่สำเร็จ");
         await browser.close();
-        return AGENT(file_name, queueBotId, from, to);
+        return ALL_AGENT( queueBotId, from, to);
       }
       console.log("login สำเร็จ", title);
 
@@ -120,7 +120,7 @@ const AGENT = async (file_name, queueBotId, from, to) => {
       if (title === ":: Management ::") {
         console.log("login ไม่สำเร็จ");
         await browser.close();
-        return AGENT(file_name, queueBotId, from, to);
+        return ALL_AGENT( queueBotId, from, to);
       }
 
       //หามาสเตอร์
@@ -218,46 +218,44 @@ const AGENT = async (file_name, queueBotId, from, to) => {
         masterId: obj[19],
         position: "AGENT",
         queueBotId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
       });
     });
-    let workbook = new excel.Workbook();
-    let worksheet = workbook.addWorksheet(`AGENT`);
-    worksheet.columns = [
-      { header: "Account", key: "Account", width: 15 },
-      { header: "Contact", key: "Contact", width: 15 },
-      { header: "Cur", key: "Cur", width: 5 },
-      { header: "Amount", key: "Amount", width: 15 },
-      { header: "Valid Amount", key: "ValidAmount", width: 15 },
-      { header: "Member Count", key: "MemberCount", width: 15 },
-      { header: "Stake Count", key: "StakeCount", width: 15 },
-      { header: "Gross Comm", key: "GrossCom", width: 15 },
-      { header: "Members W/L", key: "MemberWL", width: 15 },
-      { header: "Members Com", key: "MemberCom", width: 15 },
-      { header: "Members W/L + Com", key: "MemberWLCom", width: 25 },
-      {
-        header: "Master/Agent Profit Valid Amount",
-        key: "SuperProfitValid",
-        width: 30,
-      },
-      { header: "Master/Agent Profit W/L", key: "SuperProfitWL", width: 30 },
-      { header: "Master/Agent Profit Com", key: "SuperProfitCom", width: 30 },
-      {
-        header: "Master/Agent Profit W/L + Com",
-        key: "SuperProfitWLCom",
-        width: 30,
-      },
-      { header: "Company Profit Valid Amount", key: "CompanyValid", width: 30 },
-      { header: "Company Profit W/L", key: "CompanyWL", width: 30 },
-      { header: "Company Profit Com", key: "CompanyCom", width: 30 },
-      { header: "Company Profit W/L + Com", key: "CompanyWLCom", width: 30 },
-    ];
-    // Add Array Rows
-    worksheet.addRows(tutorials);
-    workbook.xlsx.writeFile(`./excel/${file_name}`).then(() => {
-      console.log("file saved!" + file_name);
-    });
+    // let workbook = new excel.Workbook();
+    // let worksheet = workbook.addWorksheet(`AGENT`);
+    // worksheet.columns = [
+    //   { header: "Account", key: "Account", width: 15 },
+    //   { header: "Contact", key: "Contact", width: 15 },
+    //   { header: "Cur", key: "Cur", width: 5 },
+    //   { header: "Amount", key: "Amount", width: 15 },
+    //   { header: "Valid Amount", key: "ValidAmount", width: 15 },
+    //   { header: "Member Count", key: "MemberCount", width: 15 },
+    //   { header: "Stake Count", key: "StakeCount", width: 15 },
+    //   { header: "Gross Comm", key: "GrossCom", width: 15 },
+    //   { header: "Members W/L", key: "MemberWL", width: 15 },
+    //   { header: "Members Com", key: "MemberCom", width: 15 },
+    //   { header: "Members W/L + Com", key: "MemberWLCom", width: 25 },
+    //   {
+    //     header: "Master/Agent Profit Valid Amount",
+    //     key: "SuperProfitValid",
+    //     width: 30,
+    //   },
+    //   { header: "Master/Agent Profit W/L", key: "SuperProfitWL", width: 30 },
+    //   { header: "Master/Agent Profit Com", key: "SuperProfitCom", width: 30 },
+    //   {
+    //     header: "Master/Agent Profit W/L + Com",
+    //     key: "SuperProfitWLCom",
+    //     width: 30,
+    //   },
+    //   { header: "Company Profit Valid Amount", key: "CompanyValid", width: 30 },
+    //   { header: "Company Profit W/L", key: "CompanyWL", width: 30 },
+    //   { header: "Company Profit Com", key: "CompanyCom", width: 30 },
+    //   { header: "Company Profit W/L + Com", key: "CompanyWLCom", width: 30 },
+    // ];
+    // // Add Array Rows
+    // worksheet.addRows(tutorials);
+    // workbook.xlsx.writeFile(`./excel/${file_name}`).then(() => {
+    //   console.log("file saved!" + file_name);
+    // });
     return tutorials;
   } catch (error) {
     console.log("ERROR อะดิ", error);
@@ -266,7 +264,7 @@ const AGENT = async (file_name, queueBotId, from, to) => {
       data: { status: "FAILED", updatedAt: moment().format() },
     });
 
-    return AGENT(file_name, queueBotId, from, to);
+    return ALL_AGENT( queueBotId, from, to);
   }
 };
 
@@ -274,4 +272,4 @@ function sleep(ms) {
   return new Promise((resolve) => setInterval(resolve, ms));
 }
 
-exports.AGENT = AGENT;
+exports.AGENT = ALL_AGENT;

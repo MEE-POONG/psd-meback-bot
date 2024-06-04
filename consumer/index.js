@@ -13,6 +13,7 @@ const amqp = require("amqplib");
 const { AGENT } = require("../script/agent");
 const { MASTER } = require("../script/master");
 const { CUSTOMER } = require("../script/customer");
+const { ALL_AGENT } = require("../script/all/agent");
 var channel, connection;
 
 
@@ -27,6 +28,7 @@ async function connectQueue() {
     await channel.assertQueue("agent", { durable: true })
     await channel.assertQueue("master", { durable: true })
     await channel.assertQueue("customer", { durable: true })
+    await channel.assertQueue("all-agent", { durable: true })
 
     channel.prefetch(1)
 
@@ -130,6 +132,42 @@ async function connectQueue() {
         }
 
     })
+
+    channel.consume("all-agent", async data => {
+
+        const content = JSON.parse(Buffer.from(data.content))
+        const { id, startDate, endDate } = content
+        console.log(id)
+        await prisma.queueBot.update({
+            where: { id },
+            data: { status: 'WAITTING', updatedAt: moment().format() },
+        })
+        console.log("Data received : ", `${JSON.stringify(content, null, 2)}`);
+
+        // const file_name = 'AGENT_' + id + '.xlsx'
+        const tutorials = await ALL_AGENT(id, startDate, endDate)
+
+        try {
+            if (tutorials.length == 0) {
+                throw new Error("No data")
+            }
+            await prisma.pastAG.createMany({ data: tutorials })
+            await prisma.queueBot.update({
+                where: { id },
+                data: { status: 'SUCCESS', updatedAt: moment().format(), file_name },
+            })
+        } catch (error) {
+            console.log(error)
+
+            await prisma.queueBot.update({
+                where: { id },
+                data: { status: 'FAILED', updatedAt: moment().format() },
+            })
+        }
+
+        channel.ack(data, true)
+    })
+
 }
 
 
